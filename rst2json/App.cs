@@ -107,7 +107,7 @@ void Encoder([NotNull] string input, string? output) {
     RVersion version;
 
     // Version is null ? --- or --- GetRType() return an Invalid Type.
-    if (!json.ContainsKey(VersionConst) || (version = (RVersion)Convert.ToByte(json[VersionConst])).GetRType() == null) {
+    if (!json.ContainsKey(VersionConst) || (version = (RVersion)Convert.ToByte(json[VersionConst].GetString())).GetRType() == null) {
         /* No version, get the latest */
         version = RVersionHelper.GetLatestVersion();
     }
