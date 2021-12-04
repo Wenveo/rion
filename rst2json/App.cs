@@ -107,7 +107,7 @@ void Encoder([NotNull] string input, string? output) {
     RVersion version;
 
 
-    if ( /* tmp is null ? */    (tmp = json.FirstOrDefault(x => x.Name == VersionConst)).Value.ValueKind == JsonValueKind.Undefined ||
+    if ( /* tmp is null ? */    (tmp = json.FirstOrDefault(x => x.Name.ToLower() == VersionConst)).Value.ValueKind == JsonValueKind.Undefined ||
          /* version.GetRtype is null ? */    (version = (RVersion)Convert.ToByte(tmp.Value.ToString()) ).GetRType() == null)
     {
         /* No version, get the latest */
@@ -117,7 +117,7 @@ void Encoder([NotNull] string input, string? output) {
     // Initialization
     var rst = new RSTFile(version);
 
-    if ((tmp = json.FirstOrDefault(x => x.Name == EntriesConst)).Value.ValueKind == JsonValueKind.Object)
+    if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == EntriesConst)).Value.ValueKind == JsonValueKind.Object)
     {
         // Entries
         foreach (var item in tmp.Value.EnumerateObject())
@@ -129,16 +129,20 @@ void Encoder([NotNull] string input, string? output) {
             if (string.IsNullOrEmpty(property))
                 continue;
 
+            // Compatible with "CommunityDragon" format
+            if (property.StartsWith("{"))
+                property = property.Replace("{", "").Replace("}", "");
+            
             // Parse the key
             if (!ulong.TryParse(property, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash))
-            {
+            { 
                 hash = RSTHash.ComputeHash(property, rst.Type);
             }
             rst.AddEntry(hash, item.Value.ToString());
         }
     }
     // Config
-    if ((tmp = json.FirstOrDefault(x => x.Name == ConfigConst)).Value.ValueKind == JsonValueKind.String)
+    if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == ConfigConst)).Value.ValueKind == JsonValueKind.String)
         rst.SetConfig(tmp.Value.GetString());
 
     // Write to memory instead of using "File.Create" to avoid creating files that cannot be written out
