@@ -84,10 +84,18 @@ static void InitializeHashtable<TKey>(string hashTablePath, out Dictionary<TKey,
     if (method is not null && File.Exists(hashTablePath)) {
         foreach (string? item in File.ReadLines(hashTablePath)) {
 
-            var index = item.IndexOf(' ');
-            var hName = item.Substring(0, index);
-            var value = item.Substring(index + 1);
-
+            string hName, value;
+            if (item.Contains(' '))
+            {
+                var index = item.IndexOf(' ');
+                hName = item.Substring(0, index);
+                value = item.Substring(index + 1);
+            }
+            else
+            {
+                (hName, value) = (item, item);
+            }
+            
             var hash = (TKey?)method.Invoke(null, new object[] { hName, NumberStyles.HexNumber });
 
             if (hash is not null && !dict.ContainsKey(hash)) {
@@ -97,6 +105,7 @@ static void InitializeHashtable<TKey>(string hashTablePath, out Dictionary<TKey,
     }
 
 }
+
 void Equals(string[] args)
 {
     if (args.Length < 2) {
