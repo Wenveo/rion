@@ -122,12 +122,19 @@ void Encoder([NotNull] string input, string? output) {
         // Entries
         foreach (var item in tmp.Value.EnumerateObject())
         {
+            // Property Name
+            string property = item.Name;
+
+            // NULLCHECK
+            if (string.IsNullOrEmpty(property))
+                continue;
+
             // Parse the key
-            if (!ulong.TryParse(item.Name, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash))
+            if (!ulong.TryParse(property, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash))
             {
-                hash = RSTHash.ComputeHash(item.Name, rst.Type);
+                hash = RSTHash.ComputeHash(property, rst.Type);
             }
-            rst.AddEntry(hash, item.Value.GetString() ?? string.Empty);
+            rst.AddEntry(hash, item.Value.ToString());
         }
     }
     // Config
