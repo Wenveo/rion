@@ -11,9 +11,9 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 
 #region Const
-const string ConfigConst  = "Config";
-const string EntriesConst = "Entries";
-const string VersionConst = "Version";
+const string ConfigConst  = "config";
+const string EntriesConst = "entries";
+const string VersionConst = "version";
 #endregion
 
 #region OnStartup
@@ -98,16 +98,18 @@ void Encoder([NotNull] string input, string? output) {
         output = GeNpath(input, ".txt");
 
     // Json file contents
-    Dictionary<string, JsonElement>? json;
+    var json = JsonDocument.Parse(File.OpenRead(input)).RootElement.EnumerateObject();
 
-    // Check
-    if ((json = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(File.ReadAllText(input))) is null) return;
+    // temp
+    JsonProperty tmp;
 
     // Set Version
     RVersion version;
 
-    // Version is null ? --- or --- GetRType() return an Invalid Type.
-    if (!json.ContainsKey(VersionConst) || (version = (RVersion)Convert.ToByte(json[VersionConst].GetString())).GetRType() == null) {
+
+    if ( /* tmp is null ? */    (tmp = json.FirstOrDefault(x => x.Name == VersionConst)).Value.ValueKind == JsonValueKind.Undefined ||
+         /* version.GetRtype is null ? */    (version = (RVersion)Convert.ToByte(tmp.Value.ToString()) ).GetRType() == null)
+    {
         /* No version, get the latest */
         version = RVersionHelper.GetLatestVersion();
     }
@@ -115,19 +117,22 @@ void Encoder([NotNull] string input, string? output) {
     // Initialization
     var rst = new RSTFile(version);
 
-    if (json.ContainsKey(EntriesConst)) {
+    if ((tmp = json.FirstOrDefault(x => x.Name == EntriesConst)).Value.ValueKind == JsonValueKind.Object)
+    {
         // Entries
-        foreach (var item in json[EntriesConst].EnumerateObject()) {
+        foreach (var item in tmp.Value.EnumerateObject())
+        {
             // Parse the key
-            if (!ulong.TryParse(item.Name, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash)) {
+            if (!ulong.TryParse(item.Name, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash))
+            {
                 hash = RSTHash.ComputeHash(item.Name, rst.Type);
             }
             rst.AddEntry(hash, item.Value.GetString() ?? string.Empty);
         }
     }
     // Config
-    if (json.ContainsKey(ConfigConst))
-        rst.SetConfig(json[ConfigConst].GetString());
+    if ((tmp = json.FirstOrDefault(x => x.Name == ConfigConst)).Value.ValueKind == JsonValueKind.String)
+        rst.SetConfig(tmp.Value.GetString());
 
     // Write to memory instead of using "File.Create" to avoid creating files that cannot be written out
     using var ms = new MemoryStream();
