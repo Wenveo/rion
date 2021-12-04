@@ -22,6 +22,8 @@ if (args.Contains("-h") || args.Contains("--help"))
     PrintHelp();
 else if (args.Contains("-v") || args.Contains("--version"))
     PrintVersion();
+else if (args.Contains("-e") || args.Contains("--equals"))
+    Equals(args.Where(x => x != "-e" && x != "--equals").ToArray());
 else if (args.Length >= 1 && File.Exists(args[0]))
     PrintAppInfo();
 else
@@ -39,6 +41,7 @@ void PrintHelp() {
     println("Usage: rst2json [input-file-path] [output-file-path]");
     println();
     println("Options:");
+    println("  -e|--equals   Check whether the files are the same.");
     println("  -h|--help     Display help.");
     println("  -v|--version  Display version.");
     println();
@@ -80,16 +83,47 @@ static void InitializeHashtable<TKey>(string hashTablePath, out Dictionary<TKey,
 
     if (method is not null && File.Exists(hashTablePath)) {
         foreach (string? item in File.ReadLines(hashTablePath)) {
-            string[] line = item.Split(' ');
 
-            var hash = (TKey?)method.Invoke(null, new object[] { line[0], NumberStyles.HexNumber });
+            var index = item.IndexOf(' ');
+            var hName = item.Substring(0, index);
+            var value = item.Substring(index + 1);
+
+            var hash = (TKey?)method.Invoke(null, new object[] { hName, NumberStyles.HexNumber });
 
             if (hash is not null && !dict.ContainsKey(hash)) {
-                dict.Add(hash, line[1]);
+                dict.Add(hash, value);
             }
         }
     }
 
+}
+void Equals(string[] args)
+{
+    if (args.Length < 2) {
+        println("Error: Not enough arguments.");
+        return;
+    }
+
+    if (!File.Exists(args[0])) {
+        println("Error: File not found.");
+        return;
+    }
+
+    if (!File.Exists(args[1])) {
+        println("Error: File not found.");
+        return;
+    }
+
+    var rst1 = new RSTFile(File.OpenRead(args[0]), false);
+    var rst2 = new RSTFile(File.OpenRead(args[1]), false);
+
+    if (rst1.Equals(rst2)) {
+        println("Files are the same.");
+    } else {
+        println("Files are different.");
+    }
+
+    Environment.Exit(0);
 }
 
 void Encoder([NotNull] string input, string? output) {
