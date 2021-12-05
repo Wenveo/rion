@@ -10,6 +10,22 @@ using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
+#region ExCode
+const int EX_OK		= 0; /* successful termination */
+const int EX_Error  = 1; /* error termination */
+const int EX_USAGE  = 2; /* command line usage error */
+
+void Exit(int ex_code) {
+    Environment.Exit(ex_code);
+}
+
+void Error(int ex_code, string message) {
+    Console.Error.WriteLine(message);
+    Exit(ex_code);
+}
+
+#endregion
+
 #region Const
 const string ConfigConst  = "config";
 const string EntriesConst = "entries";
@@ -18,7 +34,9 @@ const string VersionConst = "version";
 
 #region OnStartup
 
-if (args.Contains("-h") || args.Contains("--help"))
+if (args.Length < 1)
+    Error(EX_USAGE, "No input file specified.");
+else if (args.Contains("-h") || args.Contains("--help"))
     PrintHelp();
 else if (args.Contains("-v") || args.Contains("--version"))
     PrintVersion();
@@ -27,7 +45,7 @@ else if (args.Contains("-e") || args.Contains("--equals"))
 else if (args.Length >= 1 && File.Exists(args[0]))
     PrintAppInfo();
 else
-    PrintHelp();
+    Error(EX_USAGE, "Input file does not exist.");
 
 InitializeHashtable("RSTHashes.txt", out Dictionary<ulong, string> hashTable);
 
@@ -50,7 +68,7 @@ void PrintHelp() {
     println("output-file-path:");
     println("  The path to the output file.");
     println();
-    Environment.Exit(0);
+    Exit(EX_OK);
 }
 
 void PrintVersion() {
@@ -60,9 +78,8 @@ void PrintVersion() {
     var version = $"{assemblyName.Name} {assemblyName.Version} #{Environment.OSVersion.Platform} {assemblyName.ProcessorArchitecture} {File.GetLastWriteTimeUtc(System.AppContext.BaseDirectory + Path.DirectorySeparatorChar + assemblyName.Name).ToString("R", new CultureInfo("en-US"))} {RuntimeInformation.RuntimeIdentifier}";
 
     println(version);
-    Environment.Exit(0);
+    Exit(EX_OK);
 }
-
 void PrintAppInfo() {
     println();
     println($"Version {Assembly.GetExecutingAssembly().GetName().Version}");
@@ -110,19 +127,19 @@ static void InitializeHashtable<TKey>(string hashTablePath, out Dictionary<TKey,
 
 void Equals(string[] args)
 {
+    if (args.Length == 1) {
+        Error(EX_USAGE, "Equals requires two files.");
+    }
     if (args.Length < 2) {
-        println("Error: Not enough arguments.");
-        return;
+        Error(EX_USAGE, "Error: Not enough arguments.");
     }
 
     if (!File.Exists(args[0])) {
-        println("Error: File not found.");
-        return;
+        Error(EX_Error, "Error: File not found.");
     }
 
     if (!File.Exists(args[1])) {
-        println("Error: File not found.");
-        return;
+        Error(EX_Error, "Error: File not found.");
     }
 
     var rst1 = new RSTFile(File.OpenRead(args[0]), false);
@@ -134,7 +151,7 @@ void Equals(string[] args)
         println("Files are different.");
     }
 
-    Environment.Exit(0);
+    Exit(EX_OK);
 }
 
 void Encoder([NotNull] string input, string? output) {
@@ -294,7 +311,7 @@ void App()
     if (args.Length >= 2)
         output = args[1];
 
-    println($"input:  {input}");
+    println($"input:  {Path.GetFullPath(input)}");
 
     FileType type = GetFileType(input);
 
@@ -303,7 +320,7 @@ void App()
     else if (type == FileType.Json)
         Encoder(input, output);
     else
-        println("   Invalid file type!");
+        Error(EX_Error, "   Invalid file type!");
 
     println();
 }
