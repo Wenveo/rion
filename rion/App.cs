@@ -55,8 +55,8 @@ InitializeHashtable("RSTHashes.txt", out Dictionary<ulong, string> hashTable);
 
 void PrintHelp() {
     println();
-    println("Usage: rst2json [options]");
-    println("Usage: rst2json [input-file-path] [output-file-path]");
+    println("Usage: rion [options]");
+    println("Usage: rion [input-file-path] [output-file-path]");
     println();
     println("Options:");
     println("  -e|--equals   Check whether the files are the same.");

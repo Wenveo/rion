@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/rst2json/bin/Debug/net6.0/rst2json.dll",
+            "program": "${workspaceFolder}/rion/bin/Debug/net6.0/rion.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/rst2json",
+            "cwd": "${workspaceFolder}/rion",
             "console": "internalConsole",
             "stopAtEntry": false
         },
