@@ -30,6 +30,7 @@ void Error(int ex_code, string message) {
 const string ConfigConst  = "config";
 const string EntriesConst = "entries";
 const string VersionConst = "version";
+const string ReleaseConst = "0.1.0.0-beta";
 #endregion
 
 #region OnStartup
@@ -82,7 +83,7 @@ void PrintVersion() {
 }
 void PrintAppInfo() {
     println();
-    println($"Version {Assembly.GetExecutingAssembly().GetName().Version}");
+    println($"Version {ReleaseConst}");
     println($"Powered by .Net {Environment.Version}");
     println();
 }
