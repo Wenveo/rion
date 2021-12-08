@@ -75,7 +75,7 @@ void PrintVersion() {
     var assembly = Assembly.GetExecutingAssembly();
     var assemblyName = assembly.GetName();
 
-    var version = $"{assemblyName.Name} {assemblyName.Version} #{Environment.OSVersion.Platform} {assemblyName.ProcessorArchitecture} {File.GetLastWriteTimeUtc(System.AppContext.BaseDirectory + Path.DirectorySeparatorChar + assemblyName.Name).ToString("R", new CultureInfo("en-US"))} {RuntimeInformation.RuntimeIdentifier}";
+    var version = $"{assemblyName.Name} {assemblyName.Version} #{Environment.OSVersion.Platform} {assemblyName.ProcessorArchitecture} {File.GetLastWriteTime(System.AppContext.BaseDirectory + Path.DirectorySeparatorChar + assemblyName.Name).ToString("R", new CultureInfo("en-US"))} {RuntimeInformation.RuntimeIdentifier}";
 
     println(version);
     Exit(EX_OK);
