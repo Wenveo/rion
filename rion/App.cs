@@ -201,7 +201,7 @@ void Encoder([NotNull] string input, string? output) {
             { 
                 hash = RSTHash.ComputeHash(property, rst.Type);
             }
-            rst.AddEntry(hash, item.Value.ToString());
+            rst.Add(hash, item.Value.ToString());
         }
     }
     // Config
@@ -249,7 +249,7 @@ void Decoder([NotNull] string input, string? output)
     // Entries.Start
     jw.WriteStartObject();
 
-    foreach (RSTEntry item in rst.Entries) {
+    foreach (RSTEntry item in rst.Values) {
         // The name of the hash
         string hashName;
 
