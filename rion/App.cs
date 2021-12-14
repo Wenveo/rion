@@ -31,10 +31,10 @@ const string ConfigConst  = "config";
 const string EntriesConst = "entries";
 const string VersionConst = "version";
 const string ReleaseConst = "0.1.0.0-beta";
+const string HashesConst  = "RSTHashes.txt";
 #endregion
 
 #region OnStartup
-
 if (args.Length < 1)
     Error(EX_USAGE, "No input file specified.");
 else if (args.Contains("-h") || args.Contains("--help"))
@@ -48,7 +48,16 @@ else if (args.Length >= 1 && File.Exists(args[0]))
 else
     Error(EX_USAGE, "Input file does not exist.");
 
-InitializeHashtable("RSTHashes.txt", out Dictionary<ulong, string> hashTable);
+Dictionary<ulong, string> hashTable;
+
+if (Assembly.GetExecutingAssembly().GetName().ProcessorArchitecture == ProcessorArchitecture.None)
+{
+    InitializeHashtable_Native($"{AppDomain.CurrentDomain.BaseDirectory}{HashesConst}", out hashTable);
+}
+else
+{
+    InitializeHashtable($"{AppDomain.CurrentDomain.BaseDirectory}{HashesConst}", out hashTable);
+}
 
 #endregion
 
@@ -98,7 +107,7 @@ static void InitializeHashtable<TKey>(string hashTablePath, out Dictionary<TKey,
     dict = new Dictionary<TKey, string>();
 
     var method = typeof(TKey).GetMethod("Parse", new Type[] { typeof(string), typeof(NumberStyles) });
-
+    // Null in native
     if (method is not null && File.Exists(hashTablePath)) {
         foreach (string? item in File.ReadLines(hashTablePath)) {
 
@@ -124,6 +133,35 @@ static void InitializeHashtable<TKey>(string hashTablePath, out Dictionary<TKey,
         }
     }
 
+}
+
+static void InitializeHashtable_Native(string hashTablePath, out Dictionary<ulong, string> dict)
+{
+    dict = new Dictionary<ulong, string>();
+    foreach (string? item in File.ReadLines(hashTablePath))
+    {
+
+        if (item is null) continue;
+
+        string hName, value;
+        if (item.Contains(' '))
+        {
+            var index = item.IndexOf(' ');
+            hName = item.Substring(0, index);
+            value = item.Substring(index + 1);
+        }
+        else
+        {
+            (hName, value) = (item, item);
+        }
+
+        var hash = ulong.Parse(hName, NumberStyles.HexNumber);
+
+        if (!dict.ContainsKey(hash))
+        {
+            dict.Add(hash, value);
+        }
+    }
 }
 
 void Equals(string[] args)
@@ -303,15 +341,8 @@ FileType GetFileType(string input) {
     return FileType.Unknown;
 }
 
-[STAThread]
-void App()
+void Conv(string input, string output)
 {
-    string input = args[0];
-    string output = string.Empty;
-
-    if (args.Length >= 2)
-        output = args[1];
-
     println($"input:  {Path.GetFullPath(input)}");
 
     FileType type = GetFileType(input);
@@ -324,6 +355,15 @@ void App()
         Error(EX_Error, "   Invalid file type!");
 
     println();
+}
+
+[STAThread]
+void App()
+{
+    Array.ForEach(args, delegate (string str)
+    {
+        Conv(str, string.Empty);
+    });
 }
 
 #endregion
