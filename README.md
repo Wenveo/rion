@@ -1,6 +1,6 @@
 # 📖 rion
 
-[中文](README_CN.MD)  English
+[中文](README_CN.MD) | English
 
 ***rion*** is an RST file conversion tool that allows you to convert RST files to Json files.
 
@@ -26,21 +26,24 @@ output-file-path:
 ```
 
 # 🚀 Sample
-` ` `
+
+```
 /* Convert a single file */
 rion fontconfig_zh_cn.txt
-` ` `
-` ` `
+```
+
+```
 /* Convert multiple files */
 rion fontconfig_zh_cn.txt fontconfig_zh_my.json fontconfig_en_us.txt fontconfig...
-` ` `
-` ` `
+```
+
+```
 /* Compare files */
 // Use the -e option to enter two files for comparison
 rion -e fontconfig_zh_cn.txt fontconfig_en_us.txt
-` ` `
+```
 
-** You can also drag and drop files into rion to open them, which will convert them directly. **
+**You can also drag and drop files into rion to open them, which will convert them directly.**
 
 # 🔖 Other
 
