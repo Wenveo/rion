@@ -1,8 +1,8 @@
 # 📖 rion
 
-[中文](README_CN.md)  English
+[中文](README_CN.MD)  English
 
-*** rion *** is an RST file conversion tool that allows you to convert RST files to Json files.
+***rion*** is an RST file conversion tool that allows you to convert RST files to Json files.
 
 In addition, the converted Json file can be converted back to RST to realize the conversion between RST and Json file.
 
