@@ -8,6 +8,7 @@
 
 **💡 你可以将 RST 文件转换成 Json 格式，通过编辑 Json 文件的内容，再将 Json 文件转换成 RST 文件格式,以实现修改 RST 文件的效果。** 
 
+![Image](demo.gif)
 
 # ⚙ 命令行参数
 ```
@@ -45,6 +46,7 @@ rion -e fontconfig_zh_cn.txt fontconfig_en_us.txt
 # 🔖 其它
 
 该程序代码支持跨平台，切不需要做任何修改。
+
 需要在其它平台运行的，请自行编译。
 
-pre-release 0.1.0.0 版本使用了 AOT 编译
+*pre-release 0.1.0.0 版本使用了 AOT 编译*
