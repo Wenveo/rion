@@ -6,7 +6,7 @@
 
 In addition, the converted Json file can be converted back to RST to realize the conversion between RST and Json file.
 
-**💡 You can convert the RST file to Json format by editing the content of the Json file and then converting the Json file to RST format to achieve the effect of modifying the RST file. **
+**💡 You can convert the RST file to Json format by editing the content of the Json file and then converting the Json file to RST format to achieve the effect of modifying the RST file.**
 
 
 # ⚙ Command line arguments
