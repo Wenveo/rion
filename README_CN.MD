@@ -45,7 +45,7 @@ rion -e fontconfig_zh_cn.txt fontconfig_en_us.txt
 
 # 🔖 其它
 
-该程序代码支持跨平台，切不需要做任何修改。
+该程序代码支持跨平台，且不需要做任何修改。
 
 需要在其它平台运行的，请自行编译。
 
