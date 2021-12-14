@@ -8,6 +8,7 @@ In addition, the converted Json file can be converted back to RST to realize the
 
 **💡 You can convert the RST file to Json format by editing the content of the Json file and then converting the Json file to RST format to achieve the effect of modifying the RST file.**
 
+![Image](demo.gif)
 
 # ⚙ Command line arguments
 ```
@@ -48,6 +49,7 @@ rion -e fontconfig_zh_cn.txt fontconfig_en_us.txt
 # 🔖 Other
 
 The program code supports cross-platform and does not need to be modified.
+
 If you need to run on another platform, please compile it yourself.
 
-Pre-release 0.1.0.0 uses AOT compilation
+*Pre-release 0.1.0.0 uses AOT compilation*
