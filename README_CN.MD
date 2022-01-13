@@ -13,7 +13,7 @@
 # ⚙ 命令行参数
 ```
 Usage: rion [options]
-Usage: rion [input-file-path] [output-file-path]
+Usage: rion <input-file-path> [output-file-path]
 
 Options:
   -e|--equals   Check whether the files are the same.
