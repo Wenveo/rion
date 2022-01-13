@@ -66,7 +66,7 @@ else
 void PrintHelp() {
     println();
     println("Usage: rion [options]");
-    println("Usage: rion [input-file-path] [output-file-path]");
+    println("Usage: rion <input-file-path> [output-file-path]");
     println();
     println("Options:");
     println("  -e|--equals   Check whether the files are the same.");
