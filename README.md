@@ -13,7 +13,7 @@ In addition, the converted Json file can be converted back to RST to realize the
 # ⚙ Command line arguments
 ```
 Usage: rion [options]
-Usage: rion [input-file-path] [output-file-path]
+Usage: rion <input-file-path> [output-file-path]
 
 Options:
   -e|--equals   Check whether the files are the same.
