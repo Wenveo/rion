@@ -1,17 +1,14 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-
 using Noisrev.League.IO.RST;
 using Noisrev.League.IO.RST.Helper;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
 #region ExCode
-const int EX_OK		= 0; /* successful termination */
+const int EX_OK     = 0; /* successful termination */
 const int EX_Error  = 1; /* error termination */
 const int EX_USAGE  = 2; /* command line usage error */
 
@@ -27,11 +24,13 @@ void Error(int ex_code, string message) {
 #endregion
 
 #region Const
-const string ConfigConst  = "config";
-const string EntriesConst = "entries";
-const string VersionConst = "version";
-const string ReleaseConst = "0.1.0.0-beta";
-const string HashesConst  = "RSTHashes.txt";
+const string ASSEMBLY_NAME      = "rion";
+const string ASSEMBLY_VERSION   = "0.1.1.0-stable";
+const string HASHTABLE_NAME     = "RSTHashes.txt";
+
+const string JSON_CONFIG_NAME   = "config";
+const string JSON_ENTRIES_NAME  = "entries";
+const string JSON_VERSION_NAME  = "version";
 #endregion
 
 #region OnStartup
@@ -48,16 +47,8 @@ else if (args.Length >= 1 && File.Exists(args[0]))
 else
     Error(EX_USAGE, "Input file does not exist.");
 
-Dictionary<ulong, string> hashTable;
 
-if (Assembly.GetExecutingAssembly().GetName().ProcessorArchitecture == ProcessorArchitecture.None)
-{
-    InitializeHashtable_Native($"{AppDomain.CurrentDomain.BaseDirectory}{HashesConst}", out hashTable);
-}
-else
-{
-    InitializeHashtable($"{AppDomain.CurrentDomain.BaseDirectory}{HashesConst}", out hashTable);
-}
+InitializeHashtable($"{AppDomain.CurrentDomain.BaseDirectory}{HASHTABLE_NAME}", out Dictionary<ulong, string> hashTable);
 
 #endregion
 
@@ -82,18 +73,15 @@ void PrintHelp() {
 }
 
 void PrintVersion() {
-    var assembly = Assembly.GetExecutingAssembly();
-    var assemblyName = assembly.GetName();
-
-    var version = $"{assemblyName.Name} {ReleaseConst} #{Environment.OSVersion.Platform} {assemblyName.ProcessorArchitecture} {File.GetLastWriteTime(System.AppContext.BaseDirectory + Path.DirectorySeparatorChar + assemblyName.Name).ToString("R", new CultureInfo("en-US"))} {RuntimeInformation.RuntimeIdentifier}";
+    var version = $"{ASSEMBLY_NAME} {ASSEMBLY_VERSION}";
 
     println(version);
     Exit(EX_OK);
 }
 void PrintAppInfo() {
     println();
-    println($"Version {ReleaseConst}");
-    println($"Powered by .Net {Environment.Version}");
+    println($"Version {ASSEMBLY_VERSION}");
+    println($"Powered by .Net 7.0.0");
     println();
 }
 
@@ -103,69 +91,28 @@ void println(string message = "") => Console.WriteLine(message);
 
 #region Methods
 
-static void InitializeHashtable<TKey>(string hashTablePath, out Dictionary<TKey, string> dict) where TKey : IComparable, IComparable<TKey>, IConvertible, IEquatable<TKey>, ISpanFormattable, IFormattable {
-    dict = new Dictionary<TKey, string>();
-
-    var method = typeof(TKey).GetMethod("Parse", new Type[] { typeof(string), typeof(NumberStyles) });
-    // Null in native
-    if (method is not null && File.Exists(hashTablePath)) {
-        foreach (string? item in File.ReadLines(hashTablePath)) {
-
-            if (item is null) continue;
-            
-            string hName, value;
-            if (item.Contains(' '))
-            {
-                var index = item.IndexOf(' ');
-                hName = item.Substring(0, index);
-                value = item.Substring(index + 1);
-            }
-            else
-            {
-                (hName, value) = (item, item);
-            }
-
-            var hash = (TKey?)method.Invoke(null, new object[] { hName, NumberStyles.HexNumber });
-
-            if (hash is not null && !dict.ContainsKey(hash)) {
-                dict.Add(hash, value);
-            }
-        }
-    }
-
-}
-
-static void InitializeHashtable_Native(string hashTablePath, out Dictionary<ulong, string> dict)
-{
+static void InitializeHashtable(string hashTablePath, out Dictionary<ulong, string> dict) {
     dict = new Dictionary<ulong, string>();
-    foreach (string? item in File.ReadLines(hashTablePath))
-    {
-
+    foreach (string? item in File.ReadLines(hashTablePath)) {
         if (item is null) continue;
 
         string hName, value;
-        if (item.Contains(' '))
-        {
+        if (item.Contains(' ')) {
             var index = item.IndexOf(' ');
-            hName = item.Substring(0, index);
-            value = item.Substring(index + 1);
-        }
-        else
-        {
-            (hName, value) = (item, item);
+            hName = item[..index];
+            value = item[(index + 1)..];
+        } else {
+            hName = value = item;
         }
 
         var hash = ulong.Parse(hName, NumberStyles.HexNumber);
-
-        if (!dict.ContainsKey(hash))
-        {
+        if (!dict.ContainsKey(hash)) {
             dict.Add(hash, value);
         }
     }
 }
 
-void Equals(string[] args)
-{
+void Equals(string[] args) {
     if (args.Length == 1) {
         Error(EX_USAGE, "Equals requires two files.");
     }
@@ -181,8 +128,8 @@ void Equals(string[] args)
         Error(EX_Error, "Error: File not found.");
     }
 
-    var rst1 = new RSTFile(File.OpenRead(args[0]), false);
-    var rst2 = new RSTFile(File.OpenRead(args[1]), false);
+    using var rst1 = new RSTFile(File.OpenRead(args[0]), false);
+    using var rst2 = new RSTFile(File.OpenRead(args[1]), false);
 
     if (rst1.Equals(rst2)) {
         println("Files are the same.");
@@ -193,13 +140,13 @@ void Equals(string[] args)
     Exit(EX_OK);
 }
 
-void Encoder([NotNull] string input, string? output) {
+void Encoder([NotNull] string input, [MaybeNull] string? output) {
     /* Check whether it is empty */
     if (string.IsNullOrEmpty(output))
         output = GeNpath(input, ".txt");
 
     // Json file contents
-    var json = JsonDocument.Parse(File.OpenRead(input)).RootElement.EnumerateObject();
+    using var json = JsonDocument.Parse(File.OpenRead(input)).RootElement.EnumerateObject();
 
     // temp
     JsonProperty tmp;
@@ -207,8 +154,7 @@ void Encoder([NotNull] string input, string? output) {
     // Set Version
     RVersion version;
 
-
-    if ( /* tmp is null ? */    (tmp = json.FirstOrDefault(x => x.Name.ToLower() == VersionConst)).Value.ValueKind == JsonValueKind.Undefined ||
+    if ( /* tmp is null ? */    (tmp = json.FirstOrDefault(x => x.Name.ToLower() == JSON_VERSION_NAME)).Value.ValueKind == JsonValueKind.Undefined ||
          /* version.GetRtype is null ? */    (version = (RVersion)Convert.ToByte(tmp.Value.ToString()) ).GetRType() == null)
     {
         /* No version, get the latest */
@@ -216,13 +162,11 @@ void Encoder([NotNull] string input, string? output) {
     }
 
     // Initialization
-    var rst = new RSTFile(version);
+    using var rst = new RSTFile(version);
 
-    if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == EntriesConst)).Value.ValueKind == JsonValueKind.Object)
-    {
-        // Entries
-        foreach (var item in tmp.Value.EnumerateObject())
-        {
+    // Entries
+    if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == JSON_ENTRIES_NAME)).Value.ValueKind == JsonValueKind.Object) {
+        foreach (var item in tmp.Value.EnumerateObject()) {
             // Property Name
             string property = item.Name;
 
@@ -235,15 +179,14 @@ void Encoder([NotNull] string input, string? output) {
                 property = property.Replace("{", "").Replace("}", "");
             
             // Parse the key
-            if (!ulong.TryParse(property, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash))
-            { 
+            if (!ulong.TryParse(property, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash)) { 
                 hash = RSTHash.ComputeHash(property, rst.Type);
             }
             rst.Add(hash, item.Value.ToString());
         }
     }
     // Config
-    if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == ConfigConst)).Value.ValueKind == JsonValueKind.String)
+    if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == JSON_CONFIG_NAME)).Value.ValueKind == JsonValueKind.String)
         rst.SetConfig(tmp.Value.GetString());
 
     // Write to memory instead of using "File.Create" to avoid creating files that cannot be written out
@@ -253,37 +196,34 @@ void Encoder([NotNull] string input, string? output) {
     // Outputs data from "MemoryStream"
     println($"output: {output}");
     File.WriteAllBytes(output, ms.ToArray());
-
-    rst.Dispose();
 }
 
-void Decoder([NotNull] string input, string? output)
-{
+void Decoder([NotNull] string input, [MaybeNull] string? output) {
     /* Check whether it is empty */
     if (string.IsNullOrEmpty(output))
         output = GeNpath(input, ".json");
 
     /* RST File */
-    var rst = new RSTFile(File.OpenRead(input), true);
+    using var rst = new RSTFile(File.OpenRead(input), true);
 
     // Set up an output stream
     using var ms = new MemoryStream();
-    var jw = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+    using var jw = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
 
     // Start
     jw.WriteStartObject();
 
     // Magic
     jw.WriteProperty("RMAG", RSTFile.Magic);
-    jw.WriteProperty(VersionConst, ((byte)rst.Version).ToString());
+    jw.WriteProperty(JSON_VERSION_NAME, ((byte)rst.Version).ToString());
 
     // Config
     if (!string.IsNullOrEmpty(rst.Config)) {
-        jw.WriteProperty(ConfigConst, rst.Config);
+        jw.WriteProperty(JSON_CONFIG_NAME, rst.Config);
     }
 
     // Entries
-    jw.WritePropertyName(EntriesConst);
+    jw.WritePropertyName(JSON_ENTRIES_NAME);
     // Entries.Start
     jw.WriteStartObject();
 
@@ -309,8 +249,6 @@ void Decoder([NotNull] string input, string? output)
     // Output
     println($"output: {output}");
     File.WriteAllBytes(output, ms.ToArray());
-
-    jw.Dispose();
 }
 
 /// <summary>
@@ -326,23 +264,21 @@ string GeNpath(string input, string extension) {
 /// </summary>
 FileType GetFileType(string input) {
     // Open the file
-    var fs = File.OpenRead(input);
+    using var fs = File.OpenRead(input);
 
     if (fs.Length == 0)
         return FileType.Unknown;
 
-    var @byte = fs.ReadByte();
-    if (@byte == 0x7B) /* 0x7B = { */
+    var tmp = fs.ReadByte();
+    if (tmp == 0x7B) /* 0x7B = { */
         return FileType.Json;
-    if (@byte == 0x52) /* 0x52 = R */
+    else if (tmp == 0x52) /* 0x52 = R */
         return FileType.Rst;
-
-    fs.Dispose();
-    return FileType.Unknown;
+    else 
+        return FileType.Unknown;
 }
 
-void Conv(string input, string output)
-{
+void Conv(string input, string output) {
     println($"input:  {Path.GetFullPath(input)}");
 
     FileType type = GetFileType(input);
@@ -358,10 +294,8 @@ void Conv(string input, string output)
 }
 
 [STAThread]
-void App()
-{
-    Array.ForEach(args, delegate (string str)
-    {
+void App() {
+    Array.ForEach(args, delegate (string str) {
         Conv(str, string.Empty);
     });
 }
@@ -370,7 +304,7 @@ void App()
 
 App();
 
-internal enum FileType {
+enum FileType {
     /// <summary>
     /// Json File
     /// </summary>
@@ -385,10 +319,8 @@ internal enum FileType {
     Unknown
 }
 
-static class Extensions
-{
-    public static void WriteProperty(this Utf8JsonWriter utf8JsonWriter, string key, string value)
-    {
+static class Extensions {
+    internal static void WriteProperty(this Utf8JsonWriter utf8JsonWriter, string key, string value) {
         utf8JsonWriter.WritePropertyName(key);
         utf8JsonWriter.WriteStringValue(value);
     }
