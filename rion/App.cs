@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Noisrev.League.IO.RST;
-using Noisrev.League.IO.RST.Helper;
+using Noisrev.League.IO.RST.Helpers;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Encodings.Web;
@@ -57,17 +57,16 @@ InitializeHashtable($"{AppDomain.CurrentDomain.BaseDirectory}{HASHTABLE_NAME}", 
 void PrintHelp() {
     println();
     println("Usage: rion [options]");
-    println("Usage: rion <input-file-path> [output-file-path]");
+    println("Usage: rion [input-file-path]");
     println();
     println("Options:");
     println("  -e|--equals   Check whether the files are the same.");
+    println("  -o|--output   Path to the output file.");
     println("  -h|--help     Display help.");
     println("  -v|--version  Display version.");
     println();
     println("input-file-path:");
     println("  The file path to input.");
-    println("output-file-path:");
-    println("  The path to the output file.");
     println();
     Exit(EX_OK);
 }
@@ -128,8 +127,8 @@ void Equals(string[] args) {
         Error(EX_Error, "Error: File not found.");
     }
 
-    using var rst1 = new RSTFile(File.OpenRead(args[0]), false);
-    using var rst2 = new RSTFile(File.OpenRead(args[1]), false);
+    var rst1 = new RSTFile(File.OpenRead(args[0]), false);
+    var rst2 = new RSTFile(File.OpenRead(args[1]), false);
 
     if (rst1.Equals(rst2)) {
         println("Files are the same.");
@@ -154,15 +153,15 @@ void Encoder([NotNull] string input, [MaybeNull] string? output) {
     // Set Version
     RVersion version;
 
-    if ( /* tmp is null ? */    (tmp = json.FirstOrDefault(x => x.Name.ToLower() == JSON_VERSION_NAME)).Value.ValueKind == JsonValueKind.Undefined ||
-         /* version.GetRtype is null ? */    (version = (RVersion)Convert.ToByte(tmp.Value.ToString()) ).GetRType() == null)
+    if ( /* tmp is null ? */    (tmp = json.FirstOrDefault<JsonProperty>(x => x.Name.ToLower() == JSON_VERSION_NAME)).Value.ValueKind == JsonValueKind.Undefined ||
+         /* version.GetRtype is null ? */    (version = (RVersion)System.Convert.ToByte(tmp.Value.ToString()) ).GetRType() == null)
     {
         /* No version, get the latest */
         version = RVersionHelper.GetLatestVersion();
     }
 
     // Initialization
-    using var rst = new RSTFile(version);
+    var rst = new RSTFile(version);
 
     // Entries
     if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == JSON_ENTRIES_NAME)).Value.ValueKind == JsonValueKind.Object) {
@@ -182,12 +181,12 @@ void Encoder([NotNull] string input, [MaybeNull] string? output) {
             if (!ulong.TryParse(property, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash)) { 
                 hash = RSTHash.ComputeHash(property, rst.Type);
             }
-            rst.Add(hash, item.Value.ToString());
+            rst.Entries.Add(hash, item.Value.ToString());
         }
     }
     // Config
     if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == JSON_CONFIG_NAME)).Value.ValueKind == JsonValueKind.String)
-        rst.SetConfig(tmp.Value.GetString());
+        rst.Config = tmp.Value.GetString();
 
     // Write to memory instead of using "File.Create" to avoid creating files that cannot be written out
     using var ms = new MemoryStream();
@@ -204,7 +203,7 @@ void Decoder([NotNull] string input, [MaybeNull] string? output) {
         output = GeNpath(input, ".json");
 
     /* RST File */
-    using var rst = new RSTFile(File.OpenRead(input), true);
+    var rst = new RSTFile(File.OpenRead(input), true);
 
     // Set up an output stream
     using var ms = new MemoryStream();
@@ -227,17 +226,18 @@ void Decoder([NotNull] string input, [MaybeNull] string? output) {
     // Entries.Start
     jw.WriteStartObject();
 
-    foreach (RSTEntry item in rst.Values) {
+    foreach (var item in rst.Entries) {
         // The name of the hash
         string hashName;
 
-        if (hashTable.ContainsKey(item.Hash))
+        ulong hash = item.Key;
+        if (hashTable.ContainsKey(hash))
             /* Get the name from hashTable */
-            hashName = hashTable[item.Hash];
+            hashName = hashTable[hash];
         else /* hashed hexadecimal string */
-            hashName = item.Hash.ToString("x");
+            hashName = hash.ToString("x");
 
-        jw.WriteProperty(hashName, item.Text);
+        jw.WriteProperty(hashName, item.Value);
     }
     // Entries.End
     jw.WriteEndObject();
@@ -278,7 +278,7 @@ FileType GetFileType(string input) {
         return FileType.Unknown;
 }
 
-void Conv(string input, string output) {
+void Convert(string input, string output) {
     println($"input:  {Path.GetFullPath(input)}");
 
     FileType type = GetFileType(input);
@@ -295,8 +295,12 @@ void Conv(string input, string output) {
 
 [STAThread]
 void App() {
-    Array.ForEach(args, delegate (string str) {
-        Conv(str, string.Empty);
+    if (args.Contains("-o") || args.Contains("--output")) {
+        args = args.Where(x => x != "-o" && x != "--output").ToArray();
+        Convert(args[0], args[1]);
+    }
+    else Array.ForEach(args, delegate (string str) {
+        Convert(str, string.Empty);
     });
 }
 

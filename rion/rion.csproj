@@ -6,10 +6,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Version>0.1.1.0</Version>
+    <TrimMode>link</TrimMode>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
+    <IlcTrimMetadata>true</IlcTrimMetadata>
+    <IlcDisableReflection>true</IlcDisableReflection>
+    <IlcOptimizationPreference>Size</IlcOptimizationPreference>
+    <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Noisrev.League.IO.RST" Version="2.0.0" />
+    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-preview.4.22229.4" />
+    <PackageReference Include="Noisrev.League.IO.RST" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
