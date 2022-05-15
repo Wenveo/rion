@@ -13,28 +13,35 @@
 # ⚙ 命令行参数
 ```
 Usage: rion [options]
-Usage: rion <input-file-path> [output-file-path]
+Usage: rion [input-file-path]
 
 Options:
   -e|--equals   Check whether the files are the same.
+  -o|--output   Path to the output file.
   -h|--help     Display help.
   -v|--version  Display version.
 
 input-file-path:
   The file path to input.
-output-file-path:
-  The path to the output file.
 ```
 
 # 🚀 示例
+
 ```
 /* 转换单个文件 */
 rion fontconfig_zh_cn.txt
 ```
+
+```
+/* 转换单个文件并使用 -o (或 --output) 设置输出路径 */
+rion fontconfig_zh_cn.txt -o outputFilePath
+```
+
 ```
 /* 转换多个文件 */
-rion fontconfig_zh_cn.txt fontconfig_zh_my.json fontconfig_en_us.txt fontconfig...
+rion fontconfig_zh_cn.txt fontconfig_zh_my.json fontconfig_en_us.txt ...
 ```
+
 ```
 /* 对比文件 */
 // 使用 -e 选项，输入两个文件进行比对
@@ -49,4 +56,4 @@ rion -e fontconfig_zh_cn.txt fontconfig_en_us.txt
 
 需要在其它平台运行的，请自行编译。
 
-*pre-release 0.1.0.0 版本使用了 AOT 编译*
+*Release 版本使用了 AOT 编译*

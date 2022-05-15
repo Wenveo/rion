@@ -13,35 +13,39 @@ In addition, the converted Json file can be converted back to RST to realize the
 # ⚙ Command line arguments
 ```
 Usage: rion [options]
-Usage: rion <input-file-path> [output-file-path]
+Usage: rion [input-file-path]
 
 Options:
   -e|--equals   Check whether the files are the same.
+  -o|--output   Path to the output file.
   -h|--help     Display help.
   -v|--version  Display version.
 
 input-file-path:
   The file path to input.
-output-file-path:
-  The path to the output file.
 ```
 
 # 🚀 Sample
 
 ```
 /* Convert a single file */
-rion fontconfig_zh_cn.txt
+rion fontconfig_en_us.txt
+```
+
+```
+/* Convert a single file and set the output using -o (or --output) */
+rion fontconfig_en_us.txt -o outputFilePath
 ```
 
 ```
 /* Convert multiple files */
-rion fontconfig_zh_cn.txt fontconfig_zh_my.json fontconfig_en_us.txt fontconfig...
+rion fontconfig_en_us.txt fontconfig_zh_cn.json fontconfig_zh_my.txt ...
 ```
 
 ```
 /* Compare files */
 // Use the -e option to enter two files for comparison
-rion -e fontconfig_zh_cn.txt fontconfig_en_us.txt
+rion -e fontconfig_en_us.txt fontconfig_zh_cn.txt
 ```
 
 **You can also drag and drop files into rion to open them, which will convert them directly.**
@@ -52,4 +56,4 @@ The program code supports cross-platform and does not need to be modified.
 
 If you need to run on another platform, please compile it yourself.
 
-*Pre-release 0.1.0.0 uses AOT compilation*
+*The Release Version uses AOT compilation*
