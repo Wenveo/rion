@@ -25,7 +25,7 @@ void Error(int ex_code, string message) {
 
 #region Const
 const string ASSEMBLY_NAME      = "rion";
-const string ASSEMBLY_VERSION   = "0.1.1.0-stable";
+const string ASSEMBLY_VERSION   = "0.1.2.23974";
 const string HASHTABLE_NAME     = "RSTHashes.txt";
 
 const string JSON_CONFIG_NAME   = "config";

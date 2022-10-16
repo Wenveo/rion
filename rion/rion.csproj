@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.1.1.0</Version>
+    <Version>0.1.2.23974</Version>
     <PublishAot>true</PublishAot>
     <TrimMode>link</TrimMode>
     <InvariantGlobalization>true</InvariantGlobalization>
