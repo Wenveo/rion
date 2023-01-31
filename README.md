@@ -4,7 +4,7 @@
 
 ***rion*** is a converter for RST files.  You can use this tool to convert RST files to Json files and Json files back to RST files.
 
-**💡 You can convert the RST file to Json format, then edit the contents of the Json file, and then convert the Json file to the RST file format to achieve the effect of modifying the RST file.**
+**💡 You can convert the RST file to Json format, then edit the contents of the Json file, and then convert the Json file to the RST file format to modify the RST file.**
 
 ![Image](demo.gif)
 
