@@ -2,11 +2,9 @@
 
 [中文](README_CN.MD) | English
 
-***rion*** is an RST file conversion tool that allows you to convert RST files to Json files.
+***rion*** is a converter for RST files.  You can use this tool to convert RST files to Json files and Json files back to RST files.
 
-In addition, the converted Json file can be converted back to RST to realize the conversion between RST and Json file.
-
-**💡 You can convert the RST file to Json format by editing the content of the Json file and then converting the Json file to RST format to achieve the effect of modifying the RST file.**
+**💡 You can convert the RST file to Json format, then edit the contents of the Json file, and then convert the Json file to the RST file format to achieve the effect of modifying the RST file.**
 
 ![Image](demo.gif)
 
@@ -52,8 +50,6 @@ rion -e fontconfig_en_us.txt fontconfig_zh_cn.txt
 
 # 🔖 Other
 
-The program code supports cross-platform and does not need to be modified.
-
-If you need to run on another platform, please compile it yourself.
+**Cross-platform support. Clone and compile it yourself if necessary.**
 
 *The Release Version uses AOT compilation*

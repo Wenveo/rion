@@ -2,11 +2,9 @@
 
 中文 | [English](README.md)
 
-***rion*** 是一个 RST 文件的转换工具，它可以帮你将 RST 文件转换成 Json 文件格式。
+***rion*** 是一个 RST 文件的转换器。你可以使用该工具将 RST 文件转换成 Json 文件格式，以及将 Json 文件转换回 RST文件格式。
 
-并且可以将转换出的 Json 格式文件转换回 RST，实现 RST 与 Json 文件的相互转换。
-
-**💡 你可以将 RST 文件转换成 Json 格式，通过编辑 Json 文件的内容，再将 Json 文件转换成 RST 文件格式,以实现修改 RST 文件的效果。** 
+**💡 您可以将 RST 文件转换成 Json 格式，通过编辑 Json 文件的内容，再将 Json 文件转换成 RST 文件格式，以实现修改 RST 文件的效果。** 
 
 ![Image](demo.gif)
 
@@ -52,8 +50,6 @@ rion -e fontconfig_zh_cn.txt fontconfig_en_us.txt
 
 # 🔖 其它
 
-该程序代码支持跨平台，且不需要做任何修改。
-
-需要在其它平台运行的，请自行编译。
+**支持跨平台。如有需要，请自行克隆并编译。**
 
 *Release 版本使用了 AOT 编译*

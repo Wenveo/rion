@@ -156,7 +156,7 @@ void Encoder([NotNull] string input, [MaybeNull] string? output) {
     if ( /* tmp is null ? */    (tmp = json.FirstOrDefault<JsonProperty>(x => x.Name.ToLower() == JSON_VERSION_NAME)).Value.ValueKind == JsonValueKind.Undefined ||
          /* version.GetRtype is null ? */    (version = (RVersion)System.Convert.ToByte(tmp.Value.ToString()) ).GetRType() == null)
     {
-        /* No version, get the latest */
+        /* Not version, get the latest */
         version = RVersionHelper.GetLatestVersion();
     }
 
