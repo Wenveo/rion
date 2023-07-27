@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C9A99159-EBA6-4813-A385-1DF802A8BAFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rion.Cli", "src\Rion.Cli\Rion.Cli.csproj", "{71755443-6427-487D-964A-CD7C2C4AFD85}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71755443-6427-487D-964A-CD7C2C4AFD85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71755443-6427-487D-964A-CD7C2C4AFD85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71755443-6427-487D-964A-CD7C2C4AFD85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71755443-6427-487D-964A-CD7C2C4AFD85}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{71755443-6427-487D-964A-CD7C2C4AFD85} = {C9A99159-EBA6-4813-A385-1DF802A8BAFB}
+	EndGlobalSection
+EndGlobal
