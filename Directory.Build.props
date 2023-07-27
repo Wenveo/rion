@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup Label="PackageReferences">
+    <PackageReference Include="Noisrev.League.IO.RST" Version="4.0.0-rc1" />
+  </ItemGroup>
+</Project>
