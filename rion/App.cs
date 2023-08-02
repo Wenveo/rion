@@ -83,7 +83,7 @@ void PrintVersion() {
 void PrintAppInfo() {
     println();
     println($"Version {ASSEMBLY_VERSION}");
-    println($"Powered by .Net 7.0.0");
+    println($"Powered by .Net 8.0.0");
     println();
 }
 
