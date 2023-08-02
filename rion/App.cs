@@ -2,8 +2,11 @@
 
 using Noisrev.League.IO.RST;
 using Noisrev.League.IO.RST.Helpers;
+
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
@@ -48,7 +51,7 @@ else
     Error(EX_USAGE, "Input file does not exist.");
 
 
-InitializeHashtable($"{AppDomain.CurrentDomain.BaseDirectory}{HASHTABLE_NAME}", out Dictionary<ulong, string> hashTable);
+InitializeHashtable($"{AppDomain.CurrentDomain.BaseDirectory}{HASHTABLE_NAME}", out var hashTable);
 
 #endregion
 
@@ -90,9 +93,9 @@ void println(string message = "") => Console.WriteLine(message);
 
 #region Methods
 
-static void InitializeHashtable(string hashTablePath, out Dictionary<ulong, string> dict) {
+static void InitializeHashtable(string hashTablePath, [NotNull] out Dictionary<ulong, string> dict) {
     dict = new Dictionary<ulong, string>();
-    foreach (string? item in File.ReadLines(hashTablePath)) {
+    foreach (var item in File.ReadLines(hashTablePath)) {
         if (item is null) continue;
 
         string hName, value;
@@ -142,7 +145,7 @@ void Equals(string[] args) {
 void Encoder([NotNull] string input, [MaybeNull] string? output) {
     /* Check whether it is empty */
     if (string.IsNullOrEmpty(output))
-        output = GeNpath(input, ".txt");
+        output = GeNpath(input, ".stringtable");
 
     // Json file contents
     using var json = JsonDocument.Parse(File.OpenRead(input)).RootElement.EnumerateObject();
@@ -157,7 +160,7 @@ void Encoder([NotNull] string input, [MaybeNull] string? output) {
          /* version.GetRtype is null ? */    (version = (RVersion)System.Convert.ToByte(tmp.Value.ToString()) ).GetRType() == null)
     {
         /* Not version, get the latest */
-        version = RVersionHelper.GetLatestVersion();
+        version = RVersion.Ver5;
     }
 
     // Initialization
@@ -167,7 +170,7 @@ void Encoder([NotNull] string input, [MaybeNull] string? output) {
     if ((tmp = json.FirstOrDefault(x => x.Name.ToLower() == JSON_ENTRIES_NAME)).Value.ValueKind == JsonValueKind.Object) {
         foreach (var item in tmp.Value.EnumerateObject()) {
             // Property Name
-            string property = item.Name;
+            var property = item.Name;
 
             // NULLCHECK
             if (string.IsNullOrEmpty(property))
@@ -178,7 +181,7 @@ void Encoder([NotNull] string input, [MaybeNull] string? output) {
                 property = property.Replace("{", "").Replace("}", "");
             
             // Parse the key
-            if (!ulong.TryParse(property, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ulong hash)) { 
+            if (!ulong.TryParse(property, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var hash)) { 
                 hash = RSTHash.ComputeHash(property, rst.Type);
             }
             rst.Entries.Add(hash, item.Value.ToString());
@@ -213,7 +216,7 @@ void Decoder([NotNull] string input, [MaybeNull] string? output) {
     jw.WriteStartObject();
 
     // Magic
-    jw.WriteProperty("RMAG", RSTFile.Magic);
+    jw.WriteProperty("RMAG", Encoding.ASCII.GetString(RSTFile.MagicCode));
     jw.WriteProperty(JSON_VERSION_NAME, ((byte)rst.Version).ToString());
 
     // Config
@@ -226,11 +229,12 @@ void Decoder([NotNull] string input, [MaybeNull] string? output) {
     // Entries.Start
     jw.WriteStartObject();
 
+    Debug.Assert(hashTable is not null);
     foreach (var item in rst.Entries) {
         // The name of the hash
         string hashName;
 
-        ulong hash = item.Key;
+        var hash = item.Key;
         if (hashTable.ContainsKey(hash))
             /* Get the name from hashTable */
             hashName = hashTable[hash];
@@ -281,8 +285,7 @@ FileType GetFileType(string input) {
 void Convert(string input, string output) {
     println($"input:  {Path.GetFullPath(input)}");
 
-    FileType type = GetFileType(input);
-
+    var type = GetFileType(input);
     if (type == FileType.Rst)
         Decoder(input, output);
     else if (type == FileType.Json)

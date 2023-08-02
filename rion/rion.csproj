@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Version>0.1.2.23974</Version>
@@ -17,8 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-rc.2.22472.3" />
-    <PackageReference Include="Noisrev.League.IO.RST" Version="3.1.0" />
+    <PackageReference Include="Noisrev.League.IO.RST" Version="4.0.0-rc2" />
   </ItemGroup>
 
   <ItemGroup>
